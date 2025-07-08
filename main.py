@@ -22,7 +22,10 @@ if __name__ == "__main__":
             tracker.add_habit(habit_name)
 
     elif cmd == "done":
-        print("Coming soon: mark habit as done!")
+        if len(sys.argv) < 3:
+            print("Please provide habit name.")
+        else:
+            tracker.mark_done(sys.argv[2])
 
     elif cmd == "history":
         print("Coming soon: view habit history!")

@@ -28,7 +28,7 @@ if __name__ == "__main__":
             tracker.mark_done(sys.argv[2])
 
     elif cmd == "history":
-        print("Coming soon: view habit history!")
+        tracker.show_history()
 
     else:
         print(f"Unknown command: {cmd}")

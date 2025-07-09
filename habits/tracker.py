@@ -34,3 +34,16 @@ def mark_done(name):
         print(f"Habit '{name}' not found.")
 
     storage.save_data(habits)
+
+def show_history():
+    habits = storage.load_data()
+    if not habits:
+        print("No habits found.")
+        return
+
+    for habit in habits:
+        print(f"\n📝 {habit['name']}")
+        print(f"  Created: {habit['created']}")
+        print(f"  Days Done: {len(habit['log'])}")
+        if habit['log']:
+            print(f"  Log: {', '.join(habit['log'])}")

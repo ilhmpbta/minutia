@@ -12,14 +12,13 @@ if __name__ == "__main__":
         print_help()
         sys.exit(1)
 
-    cmd = sys.argv[1]
+    cmd = sys.argv[1].lower()
 
     if cmd == "add":
         if len(sys.argv) < 3:
-            print("Please provide a habit name.")
+            print("Please provide habit name.")
         else:
-            habit_name = sys.argv[2]
-            tracker.add_habit(habit_name)
+            tracker.add_habit(sys.argv[2])
 
     elif cmd == "done":
         if len(sys.argv) < 3:
@@ -29,6 +28,21 @@ if __name__ == "__main__":
 
     elif cmd == "history":
         tracker.show_history()
+
+    elif cmd == "delete":
+        if len(sys.argv) < 3:
+            print("Please provide habit name.")
+        else:
+            tracker.delete_habit(sys.argv[2])
+
+    elif cmd == "streak":
+        if len(sys.argv) < 3:
+            print("Please provide habit name.")
+        else:
+            tracker.check_streak(sys.argv[2])
+
+    elif cmd == "export":
+        tracker.export_csv()
 
     else:
         print(f"Unknown command: {cmd}")

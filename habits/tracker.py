@@ -1,5 +1,7 @@
 from datetime import date
 from habits import storage
+from datetime import datetime, timedelta
+import csv
 
 def add_habit(name):
     habits = storage.load_data()
@@ -47,3 +49,53 @@ def show_history():
         print(f"  Days Done: {len(habit['log'])}")
         if habit['log']:
             print(f"  Log: {', '.join(habit['log'])}")
+
+def delete_habit(name):
+    habits = storage.load_data()
+    new_habits = [h for h in habits if h["name"].lower() != name.lower()]
+
+    if len(new_habits) == len(habits):
+        print(f"Habit '{name}' not found.")
+    else:
+        storage.save_data(new_habits)
+        print(f"Habit '{name}' deleted.")
+
+def check_streak(name):
+    habits = storage.load_data()
+    for h in habits:
+        if h["name"].lower() == name.lower():
+            if not h["log"]:
+                print(f"No history found for '{name}'.")
+                return
+
+            sorted_log = sorted(h["log"], reverse=True)
+            streak = 0
+            today = datetime.today().date()
+
+            for i, date_str in enumerate(sorted_log):
+                date_obj = datetime.strptime(date_str, "%Y-%m-%d").date()
+                expected = today - timedelta(days=streak)
+                if date_obj == expected:
+                    streak += 1
+                else:
+                    break
+
+            print(f"Streak for '{name}': {streak} day(s)")
+            print(f"Last done: {sorted_log[0]}")
+            return
+
+    print(f"Habit '{name}' not found.")
+
+def export_csv():
+    habits = storage.load_data()
+    if not habits:
+        print("No habits to export.")
+        return
+
+    with open("export.csv", "w", newline="") as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(["Name", "Created", "Days Done", "Log Dates"])
+        for h in habits:
+            writer.writerow([h["name"], h["created"], len(h["log"]), ", ".join(h["log"])])
+
+    print("Data exported to export.csv")

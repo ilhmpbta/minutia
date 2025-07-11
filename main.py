@@ -43,6 +43,9 @@ if __name__ == "__main__":
 
     elif cmd == "export":
         tracker.export_csv()
+        
+    elif cmd == "check":
+        tracker.check_pending_today()
 
     else:
         print(f"Unknown command: {cmd}")

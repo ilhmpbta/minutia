@@ -99,3 +99,16 @@ def export_csv():
             writer.writerow([h["name"], h["created"], len(h["log"]), ", ".join(h["log"])])
 
     print("Data exported to export.csv")
+
+def check_pending_today():
+    habits = storage.load_data()
+    today = str(date.today())
+
+    if not habits:
+        print("No habits found.")
+        return
+
+    print(f"Habit status for today ({today}):\n")
+    for habit in habits:
+        status = "✅ Done" if today in habit["log"] else "⚠️ Not done"
+        print(f"- {habit['name']}: {status}")

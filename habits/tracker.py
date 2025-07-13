@@ -112,3 +112,14 @@ def check_pending_today():
     for habit in habits:
         status = "✅ Done" if today in habit["log"] else "⚠️ Not done"
         print(f"- {habit['name']}: {status}")
+
+def get_all_habits():
+    return storage.load_data()
+
+def is_done_today(name):
+    today = str(date.today())
+    habits = storage.load_data()
+    for h in habits:
+        if h["name"].lower() == name.lower():
+            return today in h["log"]
+    return False

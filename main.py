@@ -51,6 +51,10 @@ if __name__ == "__main__":
     elif cmd == "check":
         tracker.check_pending_today()
 
+    elif cmd == "gui":
+        from gui.app import run_gui
+        run_gui()
+
     else:
         print(f"Unknown command: {cmd}")
         print_help()

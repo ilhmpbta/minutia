@@ -9,6 +9,9 @@ class MinutiaApp:
         self.root = root
         self.root.title("Minutia - Habit Tracker")
         self.root.geometry("400x400")
+        self.root.lift()
+        self.root.attributes('-topmost', True)
+        self.root.after_idle(self.root.attributes, '-topmost', False)
 
         self.habits = tracker.get_all_habits()
 
@@ -43,6 +46,10 @@ class MinutiaApp:
                                     font=("Arial", 12), state="disabled", 
                                     relief="flat", bd=0)
             status_button.pack(side="left")
+
+            del_btn = tk.Button(frame, text="🗑", command=lambda n=name: self.delete_habit(n),
+                    fg="red", bg="black", relief="flat", font=("Arial", 12))
+            del_btn.pack(side="right")
             
             # Mark as done button (real button)
             if not done_today:
@@ -50,12 +57,50 @@ class MinutiaApp:
                             command=lambda n=name: self.mark_done(n))
                 btn.pack(side="right")
 
+        # Button to add habits on the bottom side of the app
+        add_btn = tk.Button(self.root, text="➕ Add Habit", command=self.add_habit_popup,
+                fg="white", bg="black", relief="flat", font=("Arial", 12))
+        add_btn.pack(pady=10)
+
     def mark_done(self, name):
         tracker.mark_done(name)
         messagebox.showinfo("Success", f"Habit '{name}' marked as done!")
         self.habits = tracker.get_all_habits()
         self.refresh_ui()
 
+    def add_habit_popup(self):
+        popup = tk.Toplevel(self.root)
+        popup.title("Add New Habit")
+        popup.geometry("250x100")
+        popup.configure(bg="black")
+
+        tk.Label(popup, text="Habit Name:", fg="white", bg="black").pack(pady=5)
+        entry = tk.Entry(popup)
+        entry.pack()
+
+        def submit():
+            name = entry.get().strip()
+            if not name:
+                messagebox.showwarning("Input Error", "Habit name cannot be empty.")
+                return
+
+            if any(h["name"].lower() == name.lower() for h in self.habits):
+                messagebox.showwarning("Duplicate", f"Habit '{name}' already exists.")
+                return
+
+            tracker.add_habit(name)
+            self.habits = tracker.get_all_habits()
+            self.refresh_ui()
+            popup.destroy()
+
+        tk.Button(popup, text="Add", command=submit).pack(pady=5)
+
+    def delete_habit(self, name):
+        confirm = messagebox.askyesno("Confirm", f"Delete habit '{name}'?")
+        if confirm:
+            tracker.delete_habit(name)
+            self.habits = tracker.get_all_habits()
+            self.refresh_ui()
 
 def run_gui():
     root = tk.Tk()

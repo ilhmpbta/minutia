@@ -123,3 +123,9 @@ def is_done_today(name):
         if h["name"].lower() == name.lower():
             return today in h["log"]
     return False
+
+def delete_habit(name):
+    habits = storage.load_data()
+    habits = [h for h in habits if h["name"].lower() != name.lower()]
+    storage.save_data(habits)
+    

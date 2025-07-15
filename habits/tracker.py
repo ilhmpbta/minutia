@@ -86,18 +86,13 @@ def check_streak(name):
 
     print(f"Habit '{name}' not found.")
 
-def export_csv():
+def export_to_csv(filename="habits_export.csv"):
     habits = storage.load_data()
-    if not habits:
-        print("No habits to export.")
-        return
-
-    with open("export.csv", "w", newline="") as csvfile:
-        writer = csv.writer(csvfile)
-        writer.writerow(["Name", "Created", "Days Done", "Log Dates"])
+    with open(filename, "w", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow(["Habit Name", "Created", "Log Dates"])
         for h in habits:
-            writer.writerow([h["name"], h["created"], len(h["log"]), ", ".join(h["log"])])
-
+            writer.writerow([h["name"], h["created"], "; ".join(h["log"])])
     print("Data exported to export.csv")
 
 def check_pending_today():
@@ -128,4 +123,31 @@ def delete_habit(name):
     habits = storage.load_data()
     habits = [h for h in habits if h["name"].lower() != name.lower()]
     storage.save_data(habits)
-    
+
+from datetime import datetime, timedelta
+
+def get_streak(name):
+    habits = storage.load_data()
+    for h in habits:
+        if h["name"].lower() == name.lower():
+            log = sorted([datetime.fromisoformat(d) for d in h["log"]], reverse=True)
+            if not log:
+                return 0
+
+            streak = 1
+            today = datetime.today().date()
+
+            # Kalau hari ini belum ditandai done, streak dihitung dari kemarin
+            if today != log[0].date():
+                expected = today - timedelta(days=1)
+            else:
+                expected = today
+
+            for date_done in log:
+                if date_done.date() == expected:
+                    streak += 1
+                    expected -= timedelta(days=1)
+                else:
+                    break
+            return streak
+    return 0

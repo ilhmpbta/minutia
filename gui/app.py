@@ -51,6 +51,11 @@ class MinutiaApp:
                     fg="red", bg="black", relief="flat", font=("Arial", 12))
             del_btn.pack(side="right")
             
+            streak_count = tracker.get_streak(name)
+            streak_label = tk.Button(frame, text=f"🔥 {streak_count}", fg="orange", bg="black",
+                                    font=("Arial", 10), state="disabled", relief="flat", bd=0)
+            streak_label.pack(side="left")
+
             # Mark as done button (real button)
             if not done_today:
                 btn = tk.Button(frame, text="Mark as Done", 
@@ -61,6 +66,10 @@ class MinutiaApp:
         add_btn = tk.Button(self.root, text="➕ Add Habit", command=self.add_habit_popup,
                 fg="white", bg="black", relief="flat", font=("Arial", 12))
         add_btn.pack(pady=10)
+
+        export_btn = tk.Button(self.root, text="📤 Export CSV", command=self.export_csv, 
+                fg="white", bg="black", relief="flat", font=("Arial", 12))
+        export_btn.pack(pady=5)
 
     def mark_done(self, name):
         tracker.mark_done(name)
@@ -101,6 +110,10 @@ class MinutiaApp:
             tracker.delete_habit(name)
             self.habits = tracker.get_all_habits()
             self.refresh_ui()
+
+    def export_csv(self):
+        tracker.export_to_csv()
+        messagebox.showinfo("Exported", "Habits exported to habits_export.csv")
 
 def run_gui():
     root = tk.Tk()

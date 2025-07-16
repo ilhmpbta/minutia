@@ -16,6 +16,7 @@ class MinutiaApp:
         self.habits = tracker.get_all_habits()
 
         self.refresh_ui()
+        self.show_daily_warning()
 
     def refresh_ui(self):
         for widget in self.root.winfo_children():
@@ -26,8 +27,15 @@ class MinutiaApp:
                         font=("Arial", 16), fg="white", bg="black",
                         state="disabled", relief="flat", bd=0)
         title.pack(pady=10)
-        
-        for habit in self.habits:
+
+        self.show_only_undone = getattr(self, "show_only_undone", False)
+
+        display_habits = (
+            [h for h in self.habits if not tracker.is_done_today(h["name"])]
+            if self.show_only_undone else self.habits
+        )
+
+        for habit in display_habits:
             frame = tk.Frame(self.root, bg="black")
             frame.pack(fill="x", padx=20, pady=5)
             
@@ -70,6 +78,12 @@ class MinutiaApp:
         export_btn = tk.Button(self.root, text="📤 Export CSV", command=self.export_csv, 
                 fg="white", bg="black", relief="flat", font=("Arial", 12))
         export_btn.pack(pady=5)
+
+        # Filtering
+        toggle_text = "✅ Show All" if self.show_only_undone else "❌ Show Only Undone"
+        toggle_btn = tk.Button(self.root, text=toggle_text, command=self.toggle_view,
+                            fg="white", bg="black", relief="flat", font=("Arial", 12))
+        toggle_btn.pack(pady=5)
 
     def mark_done(self, name):
         tracker.mark_done(name)
@@ -114,6 +128,18 @@ class MinutiaApp:
     def export_csv(self):
         tracker.export_to_csv()
         messagebox.showinfo("Exported", "Habits exported to habits_export.csv")
+
+    def show_daily_warning(self):
+        undone = [h["name"] for h in self.habits if not tracker.is_done_today(h["name"])]
+        if undone:
+            messagebox.showwarning(
+                "Reminder",
+                f"{len(undone)} habits not done today:\n" + ", ".join(undone)
+            )
+
+    def toggle_view(self):
+        self.show_only_undone = not self.show_only_undone
+        self.refresh_ui()
 
 def run_gui():
     root = tk.Tk()
